@@ -136,7 +136,7 @@ proto.handle = function handle(conf, out) {
   // store the original URL
   req.originalUrl = req.originalUrl || req.url;
 
-  function next(err) {
+  function next() {
     if (slashAdded) {
       req.url = req.url.substr(1);
       slashAdded = false;
@@ -152,7 +152,7 @@ proto.handle = function handle(conf, out) {
 
     // all done
     if (!layer) {
-      defer(done, err);
+      defer(done);
       return;
     }
 
@@ -162,13 +162,13 @@ proto.handle = function handle(conf, out) {
 
     // skip this layer if the route doesn't match
     if (path.toLowerCase().substr(0, route.length) !== route.toLowerCase()) {
-      return next(err);
+      return next();
     }
 
     // skip if route match does not border "/", ".", or end
     var c = path.length > route.length && path[route.length];
     if (c && c !== '/' && c !== '.') {
-      return next(err);
+      return next();
     }
 
     // trim off the part of the url that matches the route
@@ -184,7 +184,7 @@ proto.handle = function handle(conf, out) {
     }
 
     // call the layer handle
-    call(layer.handle, route, err, conf, next);
+    call(layer.handle, route, conf, next);
   }
 
   next();
@@ -225,30 +225,10 @@ proto.listen = function listen() {
  * @private
  */
 
-function call(handle, route, err, conf, next) {
-  var arity = handle.length;
-  var error = err;
-  var hasError = Boolean(err);
-
+function call(handle, route, conf, next) {
   debug('%s %s : %s', handle.name || '<anonymous>', route, req.originalUrl);
-
-  try {
-    if (hasError && arity === 4) {
-      // error-handling middleware
-      handle(err, conf, next);
-      return;
-    } else if (!hasError && arity < 4) {
-      // request-handling middleware
-      handle(conf, next);
-      return;
-    }
-  } catch (e) {
-    // replace the error
-    error = e;
-  }
-
-  // continue
-  next(error);
+  handle(conf, next);
+  return;
 }
 
 /**
