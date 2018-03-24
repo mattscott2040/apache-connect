@@ -21,7 +21,6 @@ var debug = require('debug')('apache-connect:dispatcher');
 var EventEmitter = require('events').EventEmitter;
 var apache = require('apache-bridge');
 var merge = require('utils-merge');
-var parseUrl = require('parseurl');
 
 /**
  * Module exports.
@@ -121,28 +120,13 @@ proto.use = function use(route, fn) {
 
 proto.handle = function handle(conf, out) {
   var index = 0;
-  var protohost = getProtohost(req.url) || '';
-  var removed = '';
-  var slashAdded = false;
   var stack = this.stack;
+  var endif = false;
 
   // final function handler
   var done = out || conf.end;
 
-  // store the original URL
-  req.originalUrl = req.originalUrl || req.url;
-
   function next() {
-    if (slashAdded) {
-      req.url = req.url.substr(1);
-      slashAdded = false;
-    }
-
-    if (removed.length !== 0) {
-      req.url = protohost + removed + req.url.substr(protohost.length);
-      removed = '';
-    }
-
     // next callback
     var layer = stack[index++];
 
@@ -152,31 +136,44 @@ proto.handle = function handle(conf, out) {
       return;
     }
 
+    // close prev if statement
+    if(endif) {
+      conf.afterConf('</If>')
+        .beforeConf('</If>');
+    }
+
     // route data
-    var path = parseUrl(req).pathname || '/';
     var route = layer.route;
 
+    // remove trailing "/" and "."
+    route = route.replace(/[/.]+$/, '');
+
+    // escape "."
+    route = route.replace(/\./g, '\\.');
+
     // skip this layer if the route doesn't match
-    if (path.toLowerCase().substr(0, route.length) !== route.toLowerCase()) {
-      return next();
-    }
-
-    // skip if route match does not border "/", ".", or end
-    var c = path.length > route.length && path[route.length];
-    if (c && c !== '/' && c !== '.') {
-      return next();
-    }
-
-    // trim off the part of the url that matches the route
     if (route.length !== 0 && route !== '/') {
-      removed = route;
-      req.url = protohost + req.url.substr(protohost.length + removed.length);
 
-      // ensure leading slash
-      if (!protohost && req.url[0] !== '/') {
-        req.url = '/' + req.url;
-        slashAdded = true;
+      // skip if the route match does not border "/",  ".", or end 
+      var routeMatch = route + '(?:[/.].*)?$';
+      
+      conf.afterConf('<If %{REQUEST_URI} =~ m#^' + routeMatch + '#i>')
+        .beforeConf('<If %{REQUEST_URI} =~ m#^' + routeMatch + '#i>');
+
+      conf.define = function(d) {
+        if(d) {
+          conf.beforeConf('Define ' + d);
+        }
       }
+
+      // Close if statements on next pass
+      endif = true;
+
+    } else {
+
+      // Don't close if statements on next pass
+      endif = false;
+
     }
 
     // call the layer handle
@@ -225,27 +222,4 @@ function call(handle, route, conf, next) {
   debug('%s %s : %s', handle.name || '<anonymous>', route, req.originalUrl);
   handle(conf, next);
   return;
-}
-
-/**
- * Get get protocol + host for a URL.
- *
- * @param {string} url
- * @private
- */
-
-function getProtohost(url) {
-  if (url.length === 0 || url[0] === '/') {
-    return undefined;
-  }
-
-  var searchIndex = url.indexOf('?');
-  var pathLength = searchIndex !== -1
-    ? searchIndex
-    : url.length;
-  var fqdnIndex = url.substr(0, pathLength).indexOf('://');
-
-  return fqdnIndex !== -1
-    ? url.substr(0, url.indexOf('/', 3 + fqdnIndex))
-    : undefined;
 }
