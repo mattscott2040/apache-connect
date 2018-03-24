@@ -1,9 +1,13 @@
 /*!
- * connect
+ * apache-connect
+ * MIT Liscensed
+ */
+
+/*
+ * Based on connect
  * Copyright(c) 2010 Sencha Inc.
  * Copyright(c) 2011 TJ Holowaychuk
  * Copyright(c) 2015 Douglas Christopher Wilson
- * MIT Licensed
  */
 
 'use strict';
@@ -13,7 +17,7 @@
  * @private
  */
 
-var debug = require('debug')('connect:dispatcher');
+var debug = require('debug')('apache-connect:dispatcher');
 var EventEmitter = require('events').EventEmitter;
 var finalhandler = require('finalhandler');
 var http = require('http');
@@ -41,7 +45,7 @@ var defer = typeof setImmediate === 'function'
   : function(fn){ process.nextTick(fn.bind.apply(fn, arguments)) }
 
 /**
- * Create a new connect server.
+ * Create a new apache-connect server.
  *
  * @return {function}
  * @public
