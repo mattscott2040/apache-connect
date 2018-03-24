@@ -19,7 +19,6 @@
 
 var debug = require('debug')('apache-connect:dispatcher');
 var EventEmitter = require('events').EventEmitter;
-var finalhandler = require('finalhandler');
 var apache = require('apache-bridge');
 var merge = require('utils-merge');
 var parseUrl = require('parseurl');
@@ -128,10 +127,7 @@ proto.handle = function handle(conf, out) {
   var stack = this.stack;
 
   // final function handler
-  var done = out || finalhandler(conf, {
-    env: env,
-    onerror: logerror
-  });
+  var done = out || conf.end;
 
   // store the original URL
   req.originalUrl = req.originalUrl || req.url;
@@ -229,17 +225,6 @@ function call(handle, route, conf, next) {
   debug('%s %s : %s', handle.name || '<anonymous>', route, req.originalUrl);
   handle(conf, next);
   return;
-}
-
-/**
- * Log error using console.error.
- *
- * @param {Error} err
- * @private
- */
-
-function logerror(err) {
-  if (env !== 'test') console.error(err.stack || err.toString());
 }
 
 /**
