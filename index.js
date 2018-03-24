@@ -20,7 +20,7 @@
 var debug = require('debug')('apache-connect:dispatcher');
 var EventEmitter = require('events').EventEmitter;
 var finalhandler = require('finalhandler');
-var http = require('http');
+var apache = require('apache-bridge');
 var merge = require('utils-merge');
 var parseUrl = require('parseurl');
 
@@ -52,7 +52,7 @@ var defer = typeof setImmediate === 'function'
  */
 
 function createServer() {
-  function app(req, res, next){ app.handle(req, res, next); }
+  function app(conf, next){ app.handle(conf, next); }
   merge(app, proto);
   merge(app, EventEmitter.prototype);
   app.route = '/';
@@ -91,13 +91,13 @@ proto.use = function use(route, fn) {
   if (typeof handle.handle === 'function') {
     var server = handle;
     server.route = path;
-    handle = function (req, res, next) {
-      server.handle(req, res, next);
+    handle = function (conf, next) {
+      server.handle(conf, next);
     };
   }
 
-  // wrap vanilla http.Servers
-  if (handle instanceof http.Server) {
+  // wrap vanilla apache.Servers
+  if (handle instanceof apache.Server) {
     handle = handle.listeners('request')[0];
   }
 
@@ -120,7 +120,7 @@ proto.use = function use(route, fn) {
  * @private
  */
 
-proto.handle = function handle(req, res, out) {
+proto.handle = function handle(conf, out) {
   var index = 0;
   var protohost = getProtohost(req.url) || '';
   var removed = '';
@@ -128,7 +128,7 @@ proto.handle = function handle(req, res, out) {
   var stack = this.stack;
 
   // final function handler
-  var done = out || finalhandler(req, res, {
+  var done = out || finalhandler(conf, {
     env: env,
     onerror: logerror
   });
@@ -184,7 +184,7 @@ proto.handle = function handle(req, res, out) {
     }
 
     // call the layer handle
-    call(layer.handle, route, err, req, res, next);
+    call(layer.handle, route, err, conf, next);
   }
 
   next();
@@ -194,7 +194,7 @@ proto.handle = function handle(req, res, out) {
  * Listen for connections.
  *
  * This method takes the same arguments
- * as node's `http.Server#listen()`.
+ * as apache-bridge's `apache.Server#listen()`.
  *
  * HTTP and HTTPS:
  *
@@ -203,21 +203,20 @@ proto.handle = function handle(req, res, out) {
  * since your Connect "server" is really just
  * a JavaScript `Function`.
  *
- *      var connect = require('connect')
- *        , http = require('http')
- *        , https = require('https');
+ *      var connect = require('apache-connect')
+ *        , apache = require('apache-bridge');
  *
  *      var app = connect();
  *
- *      http.createServer(app).listen(80);
- *      https.createServer(options, app).listen(443);
+ *      apache.createServer(app).listen(80);
+ *      apache.createServer(app).listen(443);
  *
- * @return {http.Server}
+ * @return {apache.Server}
  * @api public
  */
 
 proto.listen = function listen() {
-  var server = http.createServer(this);
+  var server = apache.createServer(this);
   return server.listen.apply(server, arguments);
 };
 
@@ -226,7 +225,7 @@ proto.listen = function listen() {
  * @private
  */
 
-function call(handle, route, err, req, res, next) {
+function call(handle, route, err, conf, next) {
   var arity = handle.length;
   var error = err;
   var hasError = Boolean(err);
@@ -236,11 +235,11 @@ function call(handle, route, err, req, res, next) {
   try {
     if (hasError && arity === 4) {
       // error-handling middleware
-      handle(err, req, res, next);
+      handle(err, conf, next);
       return;
     } else if (!hasError && arity < 4) {
       // request-handling middleware
-      handle(req, res, next);
+      handle(conf, next);
       return;
     }
   } catch (e) {
