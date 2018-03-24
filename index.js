@@ -61,9 +61,9 @@ function createServer() {
 }
 
 /**
- * Utilize the given middleware `handle` to the given `route`,
+ * Utilize the given configureware `handle` to the given `route`,
  * defaulting to _/_. This "route" is the mount-point for the
- * middleware, when given a value other than _/_ the middleware
+ * configureware, when given a value other than _/_ the configureware
  * is only effective when that segment is present in the request's
  * pathname.
  *
@@ -106,7 +106,7 @@ proto.use = function use(route, fn) {
     path = path.slice(0, -1);
   }
 
-  // add the middleware
+  // add the configureware
   debug('use %s %s', path || '/', handle.name || 'anonymous');
   this.stack.push({ route: path, handle: handle });
 
@@ -115,7 +115,7 @@ proto.use = function use(route, fn) {
 
 /**
  * Handle server requests, punting them down
- * the middleware stack.
+ * the configureware stack.
  *
  * @private
  */

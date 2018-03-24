@@ -1,6 +1,6 @@
 {
   "name": "apache-connect",
-  "description": "High performance middleware framework",
+  "description": "Configureware for Node apache-bridge",
   "version": "0.0.0",
   "author": "Matt Scott",
   "contributors": [
@@ -12,7 +12,7 @@
   "keywords": [
     "framework",
     "web",
-    "middleware",
+    "configureware",
     "connect",
     "rack"
   ],
