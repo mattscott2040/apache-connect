@@ -30,7 +30,6 @@
   "license": "MIT",
   "files": [
     "LICENSE",
-    "HISTORY.md",
     "README.md",
     "SECURITY.md",
     "index.js"
