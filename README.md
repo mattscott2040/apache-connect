@@ -134,7 +134,7 @@ app.use(function (req, res, next) {
 })
 ```
 
-In addition to a plan function, the `fn` argument can also be an `apache-bridge` server
+In addition to a plain function, the `fn` argument can also be an `apache-bridge` server
 instance or another Apache Connect app instance.
 
 ### app.use(route, fn)
@@ -152,7 +152,7 @@ app.use('/foo', function (req, res, next) {
 })
 ```
 
-In addition to a plan function, the `fn` argument can also be a `apache-bridge` server
+In addition to a plain function, the `fn` argument can also be a `apache-bridge` server
 instance or another Apache Connect app instance.
 
 The `route` is always terminated at a path separator (`/`) or a dot (`.`) character.
