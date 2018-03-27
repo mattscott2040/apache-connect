@@ -249,13 +249,6 @@ original will be available as `req.originalUrl`). For example, if `fn` is used a
 route `/foo`, the request for `/foo/bar` will invoke `fn` with `req.url === '/bar'`
 and `req.originalUrl === '/foo/bar'`.
 
-## Running Tests
-
-```bash
-npm install
-npm test
-```
-
 ## People
 
 The Connect project would not be the same without all the people involved.
