@@ -249,16 +249,6 @@ original will be available as `req.originalUrl`). For example, if `fn` is used a
 route `/foo`, the request for `/foo/bar` will invoke `fn` with `req.url === '/bar'`
 and `req.originalUrl === '/foo/bar'`.
 
-## People
-
-The Connect project would not be the same without all the people involved.
-
-The original author of Connect is [TJ Holowaychuk](https://github.com/tj)
-
-The current lead maintainer is [Douglas Christopher Wilson](https://github.com/dougwilson)
-
-[List of all contributors](https://github.com/senchalabs/connect/graphs/contributors)
-
 ## Node Compatibility
 
   - Connect `< 1.x` - node `0.2`
