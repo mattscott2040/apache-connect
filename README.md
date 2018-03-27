@@ -1,6 +1,8 @@
 # apache-connect
 
   Apache Connect is an extensible HTTP server framework for [apache-bridge](http://github.com/mattscott2040/apache-bridge) using "plugins" known as _middleware_.
+  
+  Based on [Connect](https://github.com/senchalabs/connect) by Sencha Labs.
 
 ```js
 var connect = require('apache-connect');
