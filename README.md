@@ -18,75 +18,53 @@ apache.createServer(app).listen(3000);
 
 ## Getting Started
 
-Apache Connect is a simple framework to glue together various "middleware" to handle requests.
+Apache Connect is a simple framework to glue together various "configureware" to handle Apache configuration options.
 
 ### Install Apache Connect
 
 ```sh
-$ npm install connect
+$ npm install apache-connect
 ```
 
 ### Create an app
 
-The main component is an Apache Connect "app". This will store all the middleware
+The main component is an Apache Connect "app". This will store all the configureware
 added and is, itself, a function.
 
 ```js
 var app = connect();
 ```
 
-### Use middleware
+### Use configureware
 
 The core of Apache Connect is "using" middleware. Middleware are added as a "stack"
 where incoming requests will execute each middleware one-by-one until a middleware
 does not call `next()` within it.
 
 ```js
-app.use(function middleware1(req, res, next) {
-  // middleware 1
+app.use(function configureware1(conf, next) {
+  // configureware 1
   next();
 });
-app.use(function middleware2(req, res, next) {
-  // middleware 2
+app.use(function configureware2(conf, next) {
+  // configureware 2
   next();
 });
 ```
 
-### Mount middleware
+### Mount configureware
 
 The `.use()` method also takes an optional path string that is matched against
 the beginning of the incoming request URL. This allows for basic routing.
 
 ```js
-app.use('/foo', function fooMiddleware(req, res, next) {
-  // req.url starts with "/foo"
+app.use('/foo', function fooConfigureware(conf, next) {
+  // ${REQUEST_URI} starts with "/foo"
   next();
 });
-app.use('/bar', function barMiddleware(req, res, next) {
-  // req.url starts with "/bar"
+app.use('/bar', function barConfigureware(conf, next) {
+  // ${REQUEST_URI} starts with "/bar"
   next();
-});
-```
-
-### Error middleware
-
-There are special cases of "error-handling" middleware. There are middleware
-where the function takes exactly 4 arguments. When a middleware passes an error
-to `next`, the app will proceed to look for the error middleware that was declared
-after that middleware and invoke it, skipping any error middleware above that
-middleware and any non-error middleware below.
-
-```js
-// regular middleware
-app.use(function (req, res, next) {
-  // i had an error
-  next(new Error('boom!'));
-});
-
-// error middleware for errors that occurred in middleware
-// declared before this
-app.use(function onerror(err, req, res, next) {
-  // an error occurred!
 });
 ```
 
