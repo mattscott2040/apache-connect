@@ -1,11 +1,10 @@
 # apache-connect
 
-
-  Apache Connect is an extensible HTTP server framework for [node](http://nodejs.org) using "plugins" known as _middleware_.
+  Apache Connect is an extensible HTTP server framework for [apache-bridge](http://github.com/mattscott2040/apache-bridge) using "plugins" known as _middleware_.
 
 ```js
 var connect = require('apache-connect');
-var http = require('http');
+var apache = require('apache-bridge');
 
 var app = connect();
 
@@ -28,8 +27,8 @@ app.use(function(req, res){
   res.end('Hello from Connect!\n');
 });
 
-//create node.js http server and listen on port
-http.createServer(app).listen(3000);
+//create Apache server and listen on port
+apache.createServer(app).listen(3000);
 ```
 
 ## Getting Started
@@ -109,18 +108,18 @@ app.use(function onerror(err, req, res, next) {
 ### Create a server from the app
 
 The last step is to actually use the Apache Connect app in a server. The `.listen()` method
-is a convenience to start a HTTP server (and is identical to the `http.Server`'s `listen`
-method in the version of Node.js you are running).
+is a convenience to start a HTTP server (and is identical to the `apache.Server`'s `listen`
+method in [apache-bridge](https://github.com/mattscott2040/apache-bridge)).
 
 ```js
 var server = app.listen(port);
 ```
 
-The app itself is really just a function with three arguments, so it can also be handed
-to `.createServer()` in Node.js.
+The app itself is really just a function with two arguments, so it can also be handed
+to `.createServer()` in `apache-bridge`.
 
 ```js
-var server = http.createServer(app);
+var server = apache.createServer(app);
 ```
 
 ## Middleware
@@ -187,19 +186,17 @@ The `app` itself is a function. This is just an alias to `app.handle`.
 
 ### app.handle(req, res[, out])
 
-Calling the function will run the middleware stack against the given Node.js
-http request (`req`) and response (`res`) objects. An optional function `out`
+Calling the function will run the middleware stack against the given 
+`apache-bridge` configuration (`conf`) object. An optional function `out`
 can be provided that will be called if the request (or error) was not handled
 by the middleware stack.
 
 ### app.listen([...])
 
-Start the app listening for requests. This method will internally create a Node.js
-HTTP server and call `.listen()` on it.
+Start the app listening for requests. This method will internally create an
+`apache-bridge` server and call `.listen()` on it.
 
-This is an alias to the `server.listen()` method in the version of Node.js running,
-so consult the Node.js documentation for all the different variations. The most
-common signature is [`app.listen(port)`](https://nodejs.org/dist/latest-v6.x/docs/api/http.html#http_server_listen_port_hostname_backlog_callback).
+This is an alias to the `apache.listen()` method, so consult the [apache-bridge](https://github.com/mattscott2040/apache-bridge#serverlistenport-hostname-callback) documentation for more details.
 
 ### app.use(fn)
 
@@ -215,7 +212,7 @@ app.use(function (req, res, next) {
 })
 ```
 
-In addition to a plan function, the `fn` argument can also be a Node.js HTTP server
+In addition to a plan function, the `fn` argument can also be an `apache-bridge` server
 instance or another Apache Connect app instance.
 
 ### app.use(route, fn)
@@ -233,7 +230,7 @@ app.use('/foo', function (req, res, next) {
 })
 ```
 
-In addition to a plan function, the `fn` argument can also be a Node.js HTTP server
+In addition to a plan function, the `fn` argument can also be a `apache-bridge` server
 instance or another Apache Connect app instance.
 
 The `route` is always terminated at a path separator (`/`) or a dot (`.`) character.
