@@ -1,14 +1,14 @@
-# Connect
+# apache-connect
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
-  Connect is an extensible HTTP server framework for [node](http://nodejs.org) using "plugins" known as _middleware_.
+  Apache Connect is an extensible HTTP server framework for [node](http://nodejs.org) using "plugins" known as _middleware_.
 
 ```js
-var connect = require('connect');
+var connect = require('apache-connect');
 var http = require('http');
 
 var app = connect();
@@ -38,9 +38,9 @@ http.createServer(app).listen(3000);
 
 ## Getting Started
 
-Connect is a simple framework to glue together various "middleware" to handle requests.
+Apache Connect is a simple framework to glue together various "middleware" to handle requests.
 
-### Install Connect
+### Install Apache Connect
 
 ```sh
 $ npm install connect
@@ -48,7 +48,7 @@ $ npm install connect
 
 ### Create an app
 
-The main component is a Connect "app". This will store all the middleware
+The main component is an Apache Connect "app". This will store all the middleware
 added and is, itself, a function.
 
 ```js
@@ -57,7 +57,7 @@ var app = connect();
 
 ### Use middleware
 
-The core of Connect is "using" middleware. Middleware are added as a "stack"
+The core of Apache Connect is "using" middleware. Middleware are added as a "stack"
 where incoming requests will execute each middleware one-by-one until a middleware
 does not call `next()` within it.
 
@@ -112,7 +112,7 @@ app.use(function onerror(err, req, res, next) {
 
 ### Create a server from the app
 
-The last step is to actually use the Connect app in a server. The `.listen()` method
+The last step is to actually use the Apache Connect app in a server. The `.listen()` method
 is a convenience to start a HTTP server (and is identical to the `http.Server`'s `listen`
 method in the version of Node.js you are running).
 
@@ -171,15 +171,15 @@ Checkout [http-framework](https://github.com/Raynos/http-framework/wiki/Modules)
 
 ## API
 
-The Connect API is very minimalist, enough to create an app and add a chain
+The Apache Connect API is very minimalist, enough to create an app and add a chain
 of middleware.
 
-When the `connect` module is required, a function is returned that will construct
+When the `apache-connect` module is required, a function is returned that will construct
 a new app when called.
 
 ```js
 // require module
-var connect = require('connect')
+var connect = require('apache-connect')
 
 // create app
 var app = connect()
@@ -220,7 +220,7 @@ app.use(function (req, res, next) {
 ```
 
 In addition to a plan function, the `fn` argument can also be a Node.js HTTP server
-instance or another Connect app instance.
+instance or another Apache Connect app instance.
 
 ### app.use(route, fn)
 
@@ -238,7 +238,7 @@ app.use('/foo', function (req, res, next) {
 ```
 
 In addition to a plan function, the `fn` argument can also be a Node.js HTTP server
-instance or another Connect app instance.
+instance or another Apache Connect app instance.
 
 The `route` is always terminated at a path separator (`/`) or a dot (`.`) character.
 This means the given routes `/foo/` and `/foo` are the same and both will match requests
