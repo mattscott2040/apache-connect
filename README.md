@@ -20,12 +20,6 @@ apache.createServer(app).listen(3000);
 
 Apache Connect is a simple framework to glue together various "configureware" to handle Apache configuration options.
 
-### Install Apache Connect
-
-```sh
-$ npm install apache-connect
-```
-
 ### Create an app
 
 The main component is an Apache Connect "app". This will store all the configureware
