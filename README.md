@@ -102,11 +102,11 @@ var connect = require('apache-connect')
 var app = connect()
 ```
 
-### app(req, res[, next])
+### app(conf[, next])
 
 The `app` itself is a function. This is just an alias to `app.handle`.
 
-### app.handle(req, res[, out])
+### app.handle(conf[, out])
 
 Calling the function will run the middleware stack against the given 
 `apache-bridge` configuration (`conf`) object. An optional function `out`
@@ -123,13 +123,12 @@ This is an alias to the `apache.listen()` method, so consult the [apache-bridge]
 ### app.use(fn)
 
 Use a function on the app, where the function represents a middleware. The function
-will be invoked for every request in the order that `app.use` is called. The function
-is called with three arguments:
+will be invoked for every configure event in the order that `app.use` is called. The function
+is called with two arguments:
 
 ```js
-app.use(function (req, res, next) {
-  // req is the Node.js http request object
-  // res is the Node.js http response object
+app.use(function (conf, next) {
+  // conf is the apache-bridge configuration object
   // next is a function to call to invoke the next middleware
 })
 ```
@@ -140,14 +139,13 @@ instance or another Apache Connect app instance.
 ### app.use(route, fn)
 
 Use a function on the app, where the function represents a middleware. The function
-will be invoked for every request in which the URL (`req.url` property) starts with
+will be invoked for every request in which the URL (`${REQUEST_URI}`) starts with
 the given `route` string in the order that `app.use` is called. The function is
-called with three arguments:
+called with two arguments:
 
 ```js
-app.use('/foo', function (req, res, next) {
-  // req is the Node.js http request object
-  // res is the Node.js http response object
+app.use('/foo', function (conf, next) {
+  // conf is the apache-bridge configuration object
   // next is a function to call to invoke the next middleware
 })
 ```
@@ -161,12 +159,6 @@ with the URLs `/foo`, `/foo/`, `/foo/bar`, and `/foo.bar`, but not match a reque
 the URL `/foobar`.
 
 The `route` is matched in a case-insensitive manor.
-
-In order to make middleware easier to write to be agnostic of the `route`, when the
-`fn` is invoked, the `req.url` will be altered to remove the `route` part (and the
-original will be available as `req.originalUrl`). For example, if `fn` is used at the
-route `/foo`, the request for `/foo/bar` will invoke `fn` with `req.url === '/bar'`
-and `req.originalUrl === '/foo/bar'`.
 
 ## License
 
