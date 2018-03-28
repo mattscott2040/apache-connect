@@ -1,6 +1,6 @@
 # apache-connect
 
-  Apache Connect is an extensible HTTP server framework for [apache-bridge](http://github.com/mattscott2040/apache-bridge) using "plugins" known as _middleware_.
+  Apache Connect is an extensible HTTP server framework for [apache-bridge](https://github.com/mattscott2040/apache-bridge) using "plugins" known as _configureware_. 
   
   Based on [Connect](https://github.com/senchalabs/connect) by Sencha Labs.
 
@@ -10,7 +10,7 @@ var apache = require('apache-bridge');
 
 var app = connect();
 
-// examples coming soon
+// configureware examples coming soon
 
 //create Apache server and listen on port
 apache.createServer(app).listen(3000);
@@ -37,8 +37,8 @@ var app = connect();
 
 ### Use configureware
 
-The core of Apache Connect is "using" middleware. Middleware are added as a "stack"
-where incoming requests will execute each middleware one-by-one until a middleware
+The core of Apache Connect is "using" configureware. Configureware are added as a "stack"
+where incoming configurations will execute each configureware one-by-one until a configureware
 does not call `next()` within it.
 
 ```js
@@ -85,11 +85,14 @@ to `.createServer()` in `apache-bridge`.
 var server = apache.createServer(app);
 ```
 
+## Configureware
+
+Coming soon
 
 ## API
 
 The Apache Connect API is very minimalist, enough to create an app and add a chain
-of middleware.
+of configureware.
 
 When the `apache-connect` module is required, a function is returned that will construct
 a new app when called.
@@ -108,10 +111,10 @@ The `app` itself is a function. This is just an alias to `app.handle`.
 
 ### app.handle(conf[, out])
 
-Calling the function will run the middleware stack against the given 
+Calling the function will run the configureware stack against the given 
 `apache-bridge` configuration (`conf`) object. An optional function `out`
 can be provided that will be called if the request (or error) was not handled
-by the middleware stack.
+by the configureware stack.
 
 ### app.listen([...])
 
@@ -122,14 +125,14 @@ This is an alias to the `apache.listen()` method, so consult the [apache-bridge]
 
 ### app.use(fn)
 
-Use a function on the app, where the function represents a middleware. The function
+Use a function on the app, where the function represents a configureware. The function
 will be invoked for every configure event in the order that `app.use` is called. The function
 is called with two arguments:
 
 ```js
 app.use(function (conf, next) {
   // conf is the apache-bridge configuration object
-  // next is a function to call to invoke the next middleware
+  // next is a function to call to invoke the next configureware
 })
 ```
 
@@ -138,7 +141,7 @@ instance or another Apache Connect app instance.
 
 ### app.use(route, fn)
 
-Use a function on the app, where the function represents a middleware. The function
+Use a function on the app, where the function represents a configureware. The function
 will be invoked for every request in which the URL (`${REQUEST_URI}`) starts with
 the given `route` string in the order that `app.use` is called. The function is
 called with two arguments:
@@ -146,7 +149,7 @@ called with two arguments:
 ```js
 app.use('/foo', function (conf, next) {
   // conf is the apache-bridge configuration object
-  // next is a function to call to invoke the next middleware
+  // next is a function to call to invoke the next configureware
 })
 ```
 
