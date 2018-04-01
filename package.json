@@ -21,6 +21,7 @@
     "url": "https://github.com/mattscott2040/apache-connect.git"
   },
   "dependencies": {
+    "apache-bridge": "^0.1.6",
     "debug": "2.6.9",
     "utils-merge": "1.0.1"
   },
