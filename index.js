@@ -96,7 +96,7 @@ proto.use = function use(route, fn) {
 
   // wrap vanilla apache.Servers
   if (handle instanceof apache.Server) {
-    handle = handle.listeners('request')[0];
+    handle = handle.listeners('configure')[0];
   }
 
   // strip trailing slash
