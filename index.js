@@ -148,6 +148,8 @@ proto.handle = function handle(conf, out) {
   // final function handler
   var done = out || conf.end;
 
+  var n;
+
   function next() {
     // next callback
     var layer = stack[index++];
@@ -182,19 +184,15 @@ proto.handle = function handle(conf, out) {
       }
 
       // Close if statements on next pass
-      let n = () => {
+      this.stack.splice(index+1, 0, (conf, next) => {
         conf.addDirective('</If>');
         next();
-      }
-
-    } else {
-
-      let n = next;
+      });
 
     }
 
     // call the layer handle
-    call(layer.handle, route, conf, n);
+    call(layer.handle, route, conf, next);
   }
 
   next();
