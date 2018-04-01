@@ -174,18 +174,29 @@ proto.handle = function handle(conf, out) {
 
       // skip if the route match does not border "/",  ".", or end 
       var routeMatch = route + '(?:[/.].*)?$';
-      
-      conf.addDirective('<If "%{REQUEST_URI} =~ m#^' + routeMatch + '#i">');
 
-      conf.define = function(d) {
-        if(d) {
-          conf.beforeConf('Define ' + d);
+      // if REQUEST_URI matches /routeMatch/i
+      let ifDirective = '<If "%{REQUEST_URI} =~ m#^' + routeMatch + '#i">';
+      
+      // wrap -c and -C directives with <If ...>
+      conf.addDirective(ifDirective)
+        .addArgument('-C', ifDirective)
+
+      // store original define method
+      let define = conf.define;
+
+      // use -C instead of -D to define parameters
+      conf.define = function(parameter) {
+        if(parameter) {
+            conf.addArgument('-C', 'Define ' + parameter)
         }
       }
 
-      // Close if statements on next pass
+      // Close if directives and restore define method
       this.stack.splice(index+1, 0, (conf, next) => {
-        conf.addDirective('</If>');
+        conf.addDirective('</If>')
+          .addArgument('-C', '</If>');
+        conf.define = define;
         next();
       });
 
