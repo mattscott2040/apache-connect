@@ -158,12 +158,6 @@ proto.handle = function handle(conf, out) {
       return;
     }
 
-    // close prev if statement
-    if(endif) {
-      conf.afterConf('</If>')
-        .beforeConf('</If>');
-    }
-
     // route data
     var route = layer.route;
 
@@ -179,8 +173,7 @@ proto.handle = function handle(conf, out) {
       // skip if the route match does not border "/",  ".", or end 
       var routeMatch = route + '(?:[/.].*)?$';
       
-      conf.afterConf('<If %{REQUEST_URI} =~ m#^' + routeMatch + '#i>')
-        .beforeConf('<If %{REQUEST_URI} =~ m#^' + routeMatch + '#i>');
+      conf.addDirective('<If "%{REQUEST_URI} =~ m#^' + routeMatch + '#i">');
 
       conf.define = function(d) {
         if(d) {
@@ -189,17 +182,19 @@ proto.handle = function handle(conf, out) {
       }
 
       // Close if statements on next pass
-      endif = true;
+      let n = () => {
+        conf.addDirective('</If>');
+        next();
+      }
 
     } else {
 
-      // Don't close if statements on next pass
-      endif = false;
+      n = next;
 
     }
 
     // call the layer handle
-    call(layer.handle, route, conf, next);
+    call(layer.handle, route, conf, n);
   }
 
   next();
