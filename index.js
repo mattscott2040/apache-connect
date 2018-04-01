@@ -99,6 +99,28 @@ proto.use = function use(route, fn) {
     handle = handle.listeners('configure')[0];
   }
 
+  // wrap vanilla apache.Confs
+  if (handle instanceof apache.Conf) {
+    let c = handle;
+    handle = (conf, next) => {
+      if(typeof conf.file === 'undefined' || conf.file === null) {
+        conf.file = c.file;
+        c.file = null;
+      }
+      let args = c.getArguments();
+      let arrayLength = args.length;
+      for (var i = 0; i < arrayLength; i++) {
+        if(args[i].startsWith('-')) {
+          if(args[i+1].startsWith('-')) {
+            conf.addArgument(args[i], args[i+1]);
+          } else {
+            conf.addArgument(args[i]);
+          }
+        }
+      }
+    }
+  }
+
   // strip trailing slash
   if (path[path.length - 1] === '/') {
     path = path.slice(0, -1);
