@@ -219,7 +219,7 @@ proto.listen = function listen() {
  */
 
 function call(handle, route, conf, next) {
-  debug('%s %s : %s', handle.name || '<anonymous>', route, req.originalUrl);
+  debug('%s %s : %s', handle.name || '<anonymous>', route);
   handle(conf, next);
   return;
 }
