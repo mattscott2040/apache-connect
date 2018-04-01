@@ -189,7 +189,7 @@ proto.handle = function handle(conf, out) {
 
     } else {
 
-      n = next;
+      let n = next;
 
     }
 
