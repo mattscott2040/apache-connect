@@ -163,24 +163,12 @@ proto.handle = function handle(conf, out) {
     // route data
     var route = layer.route;
 
-    // remove trailing "/" and "."
-    route = route.replace(/[/.]+$/, '');
-
-    // escape "."
-    route = route.replace(/\./g, '\\.');
-
     // skip this layer if the route doesn't match
     if (route.length !== 0 && route !== '/') {
 
-      // skip if the route match does not border "/",  ".", or end 
-      var routeMatch = route + '(?:[/.].*)?$';
-
-      // if REQUEST_URI matches /routeMatch/i
-      let ifDirective = '<If "%{REQUEST_URI} =~ m#^' + routeMatch + '#i">';
-      
-      // wrap -c and -C directives with <If ...>
-      conf.addDirective(ifDirective)
-        .addArgument('-C', ifDirective)
+      // wrap -c and -C directives with <Location ...>
+      conf.prependDirective('<Location "' + route.toString() + '">')
+        .addDirective('<Location "' + route.toString() + '">');
 
       // store original define method
       let define = conf.define;
@@ -188,17 +176,19 @@ proto.handle = function handle(conf, out) {
       // use -C instead of -D to define parameters
       conf.define = function(parameter) {
         if(parameter) {
-            conf.addArgument('-C', 'Define ' + parameter)
+            conf.prependDirective('Define ' + parameter)
         }
       }
 
-      // Close if directives and restore define method
-      this.stack.splice(index+1, 0, (conf, next) => {
-        conf.addDirective('</If>')
-          .addArgument('-C', '</If>');
+      // Close Location directives and restore define method
+      (function(fn) {
+        stack.splice(index+1, 0, { route: '', handle: fn });
+      }(function(conf, next) {
+        conf.prependDirective('</Location>')
+          .addDirective('</Location>');
         conf.define = define;
         next();
-      });
+      }));
 
     }
 

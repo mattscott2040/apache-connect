@@ -136,9 +136,8 @@ instance or another Apache Connect app instance.
 ### app.use(route, fn)
 
 Use a function on the app, where the function represents a configureware. The function
-will be invoked for every request in which the URL (`${REQUEST_URI}`) starts with
-the given `route` string in the order that `app.use` is called. The function is
-called with two arguments:
+will be invoked for every request in which the URL starts with the given `route` string. 
+The function is called with two arguments:
 
 ```js
 app.use('/foo', function (conf, next) {
@@ -150,12 +149,15 @@ app.use('/foo', function (conf, next) {
 In addition to a plain function, the `fn` argument can also be a `apache-bridge` server
 instance or another Apache Connect app instance.
 
-The `route` is always terminated at a path separator (`/`) or a dot (`.`) character.
-This means the given routes `/foo/` and `/foo` are the same and both will match requests
-with the URLs `/foo`, `/foo/`, `/foo/bar`, and `/foo.bar`, but not match a request with
-the URL `/foobar`.
+The `route` is applied using Apache's [Location](https://httpd.apache.org/docs/2.4/mod/core.html#location) directive, which behaves somewhat differently than the original [Connect](https://github.com/senchalabs/connect) module. The example above outputs the following directive:
 
-The `route` is matched in a case-insensitive manor.
+```bash
+<Location "/foo">
+# ...
+</Location>
+```
+
+See [Apache documentation](https://httpd.apache.org/docs/2.4/mod/core.html#location) for more details about the `Location` directive.
 
 ## License
 
